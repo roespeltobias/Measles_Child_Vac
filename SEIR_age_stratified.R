@@ -192,11 +192,22 @@ out.daily$time[which.max(out.daily$newInfections)]
 ### Plots
 ###################################################
 
+# Values for titles (shown as proportions and percentages)
+baby_vac_label <- round(baby_vac_rate, 2)
+child_imm_label <- round(childs_immune, 2)
+
+baby_vac_pct_label <- round(100 * baby_vac_rate, 2)
+child_imm_pct_label <- round(100 * childs_immune, 2)
+
+title_suffix <- paste0(
+  "(baby_vac = ", baby_vac_label, ", child_immun = ", child_imm_label, ")")
+
 # Daily new infections
 plot(
   out.daily$time, out.daily$newInfections,
   type = "l", lwd = 3, col = 2,
-  xlab = "Time (days)", ylab = "New infections per day"
+  xlab = "Time (days)", ylab = "New infections per day",
+  main = paste("New Infected", title_suffix)
 )
 
 # Total SEIR
@@ -212,7 +223,8 @@ plot(
   out.daily$time, out.daily$S_total,
   type = "l", lwd = 3, col = 2,
   ylim = c(0, ymax_seir),
-  xlab = "Time (days)", ylab = "Population"
+  xlab = "Time (days)", ylab = "Population",
+  main = paste("SEIR", title_suffix)
 )
 lines(out.daily$time, out.daily$E_total, lwd = 3, col = 6)
 lines(out.daily$time, out.daily$I_total, lwd = 3, col = 3)
@@ -226,13 +238,14 @@ legend(
 )
 
 # Infectious by age group
-ymax_I <- max(out.daily$I_B, out.daily$I_C, out.daily$I_A, na.rm = TRUE)
+ymax_I_age <- max(out.daily$I_B, out.daily$I_C, out.daily$I_A, na.rm = TRUE)
 
 plot(
   out.daily$time, out.daily$I_B,
   type = "l", lwd = 3, col = 2,
-  ylim = c(0, ymax_I),
-  xlab = "Time (days)", ylab = "Infectious"
+  ylim = c(0, ymax_I_age),
+  xlab = "Time (days)", ylab = "Infectious",
+  main = paste("Infected by Group", title_suffix)
 )
 lines(out.daily$time, out.daily$I_C, lwd = 3, col = 3)
 lines(out.daily$time, out.daily$I_A, lwd = 3, col = 4)
@@ -243,3 +256,67 @@ legend(
   lwd = 3,
   bty = "n"
 )
+
+# Total infectious only (sum of all infected types)
+plot(
+  out.daily$time, out.daily$I_total,
+  type = "l", lwd = 3, col = 4,
+  xlab = "Time (days)", ylab = "Total infectious",
+  main = paste("Total Infected", title_suffix)
+)
+
+# ###################################################
+# ### Plots
+# ###################################################
+# 
+# # Daily new infections
+# plot(
+#   out.daily$time, out.daily$newInfections,
+#   type = "l", lwd = 3, col = 2,
+#   xlab = "Time (days)", ylab = "New infections per day"
+# )
+# 
+# # Total SEIR
+# ymax_seir <- max(
+#   out.daily$S_total,
+#   out.daily$E_total,
+#   out.daily$I_total,
+#   out.daily$R_total,
+#   na.rm = TRUE
+# )
+# 
+# plot(
+#   out.daily$time, out.daily$S_total,
+#   type = "l", lwd = 3, col = 2,
+#   ylim = c(0, ymax_seir),
+#   xlab = "Time (days)", ylab = "Population"
+# )
+# lines(out.daily$time, out.daily$E_total, lwd = 3, col = 6)
+# lines(out.daily$time, out.daily$I_total, lwd = 3, col = 3)
+# lines(out.daily$time, out.daily$R_total, lwd = 3, col = 4)
+# legend(
+#   "right",
+#   legend = c("S", "E", "I", "R"),
+#   col = c(2, 6, 3, 4),
+#   lwd = 3,
+#   bty = "n"
+# )
+# 
+# # Infectious by age group
+# ymax_I <- max(out.daily$I_B, out.daily$I_C, out.daily$I_A, na.rm = TRUE)
+# 
+# plot(
+#   out.daily$time, out.daily$I_B,
+#   type = "l", lwd = 3, col = 2,
+#   ylim = c(0, ymax_I),
+#   xlab = "Time (days)", ylab = "Infectious"
+# )
+# lines(out.daily$time, out.daily$I_C, lwd = 3, col = 3)
+# lines(out.daily$time, out.daily$I_A, lwd = 3, col = 4)
+# legend(
+#   "right",
+#   legend = c("I_B", "I_C", "I_A"),
+#   col = c(2, 3, 4),
+#   lwd = 3,
+#   bty = "n"
+# )
