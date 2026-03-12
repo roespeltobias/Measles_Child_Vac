@@ -116,6 +116,9 @@ seir_age_model <- function(t, x, params) {
     # Force of infection
     lambda <- beta * Itot / N
     
+    # New infections per day (instantaneous flow S -> E)
+    incidence <- lambda * (S_B + S_C + S_A)
+    
     ###################################################
     ### Babies
     ###################################################
@@ -144,7 +147,8 @@ seir_age_model <- function(t, x, params) {
       dS_B, dE_B, dI_B, dR_B,
       dS_C, dE_C, dI_C, dR_C,
       dS_A, dE_A, dI_A, dR_A
-    ))
+    ),
+    incidence = incidence)
   })
 }
 
@@ -156,19 +160,24 @@ out <- as.data.frame(lsoda(y = xstart, times = times, func = seir_age_model, par
 ###################################################
 ### Daily output
 ###################################################
+dt <- diff(times)[1]
+out$newInfections_step <- out$incidence * dt
+out$day <- floor(out$time)
+daily_incidence <- aggregate(newInfections_step ~ day, data = out, sum)
 out.daily <- out[out$time %% 1 == 0, ]
+out.daily$newInfections <- daily_incidence$newInfections_step[match(out.daily$time, daily_incidence$day)]
 
 # Total infectious / exposed / susceptible / recovered
 out.daily$I_total <- out.daily$I_B + out.daily$I_C + out.daily$I_A
 out.daily$E_total <- out.daily$E_B + out.daily$E_C + out.daily$E_A
 out.daily$S_total <- out.daily$S_B + out.daily$S_C + out.daily$S_A
 out.daily$R_total <- out.daily$R_B + out.daily$R_C + out.daily$R_A
-
-# Approximate daily new infections from decline in S_total
-out.daily$newInfections <- c(
-  out.daily$I_total[1],
-  out.daily$S_total[-nrow(out.daily)] - out.daily$S_total[-1]
-)
+# 
+# # Approximate daily new infections from decline in S_total
+# out.daily$newInfections <- c(
+#   out.daily$I_total[1],
+#   out.daily$S_total[-nrow(out.daily)] - out.daily$S_total[-1]
+# )
 
 ###################################################
 ### Inspect results
