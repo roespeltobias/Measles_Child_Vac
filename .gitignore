@@ -50,4 +50,6 @@ rsconnect/
 
 # Folder
 Figures/
-Figures_Cleaned/
+Figures_Clean/
+/Figures/
+/Figures_Clean/
